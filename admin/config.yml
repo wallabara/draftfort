@@ -1,0 +1,59 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms/schema/sveltia-cms.json
+#
+# Sveltia CMS（Git ベースのヘッドレス CMS）の設定ファイル。
+#
+#   管理画面 (GitHub Pages): https://soffium.github.io/sveltiacms/admin/
+#   配信 API (GitHub Pages): https://soffium.github.io/sveltiacms/content.json
+#
+# 設定項目のリファレンス: https://sveltiacms.app/en/docs/
+
+backend:
+  name: github
+  repo: Soffium/sveltiacms
+  branch: main
+  # 書き込み権限を持たない GitHub ユーザーでも fork + PR で投稿できるようにする
+  open_authoring: true
+  # GitHub Pages 上から GitHub にログインするには OAuth クライアントが必要。
+  # oauth-worker/ を Cloudflare Workers にデプロイしたら、次の 2 行のコメントを外す。
+  # base_url: https://sveltia-cms-auth.<あなたのサブドメイン>.workers.dev
+  # auth_endpoint: auth
+
+# 公開サイト（GitHub Pages）
+site_url: https://soffium.github.io/sveltiacms/
+display_url: https://soffium.github.io/sveltiacms/
+
+# 保存すると PR を作成し、レビュー後に公開する（下書き → レビュー → 公開）
+publish_mode: editorial_workflow
+
+# メディア（画像・ファイル）の保存先と、公開時の URL
+media_folder: /media
+public_folder: /media
+
+collections:
+  - name: submissions
+    label: 投稿フォーム
+    label_singular: 投稿
+    description: 'サイトに掲載する投稿を管理します。保存すると下書きとして PR が作成され、レビュー後に公開されます。'
+    folder: /content/submissions
+    create: true
+    delete: true
+    extension: md
+    format: yaml-frontmatter
+    # ファイル名に公開日を含める（例: 2026-09-29-はじめての投稿.md）
+    slug: '{{year}}-{{month}}-{{day}}-{{title}}'
+    sortable_fields: [date, title, author]
+    fields:
+      - { label: タイトル, name: title, widget: string, required: true }
+      - { label: 投稿者, name: author, widget: string, required: true }
+      - label: 投稿日
+        name: date
+        widget: datetime
+        type: date
+        required: false
+        hint: '空のままにすると、ファイル名の先頭の日付が公開日に使われます。'
+      - { label: 本文, name: body, widget: markdown, required: true }
+      - label: 備考
+        name: notes
+        widget: string
+        required: false
+        hint: '編集者向けのメモです。公開ページにも表示されます。'
